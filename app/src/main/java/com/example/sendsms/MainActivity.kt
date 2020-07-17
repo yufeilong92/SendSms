@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -147,15 +148,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun bindViewSmsData() {
-        val list= mutableListOf<String>()
-        contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-        null,null,null,null)?.apply {
-            while (moveToNext()){
-                val phone=getString(getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+        val list = mutableListOf<String>()
+        contentResolver.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            null, null, null, null
+        )?.apply {
+            while (moveToNext()) {
+                val phone = getString(getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
                 list.add(phone)
             }
             //过滤为空的值
-            val filter = list.filter { ""!=it&&isPhoneNum(it.trim().replace(" ","")) }
+            val filter = list.filter { "" != it && isPhoneNum(it.trim().replace(" ", "")) }
             Goheavy(filter)
         }
 
@@ -184,6 +187,15 @@ class MainActivity : AppCompatActivity() {
                 sb.append(";")
             }
         }
+
+        val smsToUri = Uri.parse ("smsto:" + "${sb.toString()}");
+        val intent =  Intent(Intent.ACTION_SENDTO, smsToUri);
+        intent.putExtra("sms_body", "$com");
+        startActivity(intent);
+        if (mShowProgressDialog != null && mShowProgressDialog!!.isShowing) {
+            mShowProgressDialog?.dismiss()
+        }
+        return
 // 长短信发送方式1
         val sendIntent = Intent("SENT_SMS_ACTION");
         val sendPI = PendingIntent.getBroadcast(getApplicationContext(), 0, sendIntent, 0);
@@ -191,8 +203,10 @@ class MainActivity : AppCompatActivity() {
         val deliverPI = PendingIntent.getBroadcast(this, 0, deliverIntent, 0);
         val smsManager = SmsManager.getDefault();
         var divideContents = smsManager.divideMessage("$com")
-        for (text in divideContents) {
-            smsManager.sendTextMessage(sb.toString(), null, text, sendPI, deliverPI);
+        for (phone in mArray!!) {
+            for (text in divideContents) {
+                smsManager.sendTextMessage(phone, null, text, sendPI, deliverPI);
+            }
         }
         Handler().postDelayed({
             if (mShowProgressDialog != null && mShowProgressDialog!!.isShowing) {
@@ -247,7 +261,7 @@ class MainActivity : AppCompatActivity() {
             val line = mReadTxtFile(path!!)
             val split = line?.split(";") as MutableList<String>
             //过滤为空的值
-            val filter = split.filter { "" != it&&isPhoneNum(it.trim().replace(" ","")) }
+            val filter = split.filter { "" != it && isPhoneNum(it.trim().replace(" ", "")) }
             Goheavy(filter)
         }
 
