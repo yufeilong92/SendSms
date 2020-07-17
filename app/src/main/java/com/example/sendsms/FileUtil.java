@@ -10,6 +10,14 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * @Author : YFL  is Creating a porject in SendSms
@@ -18,12 +26,13 @@ import android.provider.MediaStore;
  * @Time :2020/7/16 17:14
  * @Purpose :
  */
- class FileUtil {
-    public static String getRealPathFromURI(Activity a,Uri contentUri) {
+class FileUtil {
+    public static String getRealPathFromURI(Activity a, Uri contentUri) {
         String res = null;
         String[] proj = {MediaStore.Images.Media.DATA};
-        Cursor cursor =a. getContentResolver().query(contentUri, proj, null, null, null);
-        if (null != cursor && cursor.moveToFirst()) { ;
+        Cursor cursor = a.getContentResolver().query(contentUri, proj, null, null, null);
+        if (null != cursor && cursor.moveToFirst()) {
+            ;
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             res = cursor.getString(column_index);
             cursor.close();
@@ -48,12 +57,10 @@ import android.provider.MediaStore;
             if (isExternalStorageDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
                 final String[] split = docId.split(":");
-                final String type = split[0];
-
-
-                if ("primary".equalsIgnoreCase(type)) {
-                    return Environment.getExternalStorageDirectory() + "/" + split[1];
-                }
+//                final String type = split[0];
+//                if ("primary".equalsIgnoreCase(type)) {
+                return Environment.getExternalStorageDirectory() + "/" + split[1];
+//                }
             }
             // DownloadsProvider
             else if (isDownloadsDocument(uri)) {
@@ -113,7 +120,7 @@ import android.provider.MediaStore;
      *  
      */
     public static String getDataColumn(Context context, Uri uri, String selection,
-                                String[] selectionArgs) {
+                                       String[] selectionArgs) {
 
 
         Cursor cursor = null;
@@ -141,7 +148,7 @@ import android.provider.MediaStore;
      *  * @return Whether the Uri authority is ExternalStorageProvider.
      *  
      */
-    public static  boolean isExternalStorageDocument(Uri uri) {
+    public static boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
 
@@ -165,4 +172,31 @@ import android.provider.MediaStore;
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 
+    public static String mReadTxtFile(String strFilePath) {
+        String path = String.valueOf(strFilePath);
+        String content = ""; //文件内容字符串
+        //打开文件
+        File file = new File(path);
+        //如果path是传递过来的参数，可以做一个非目录的判断
+        if (file.isDirectory()) {
+        } else {
+            try {
+                InputStream instream = new FileInputStream(file);
+                if (instream != null) {
+                    String line=null;
+                    BufferedReader buffreader = new BufferedReader(new InputStreamReader(new FileInputStream(file),"UTF-8"));
+                    //分行读取
+                    while ((line = buffreader.readLine()) != null) {
+                        content += line+";";
+                    }
+                    instream.close();
+                }
+            } catch (java.io.FileNotFoundException e) {
+                Log.d("TestFile", "The File doesn't not exist.");
+            } catch (IOException e) {
+                Log.d("TestFile", e.getMessage());
+            }
+        }
+        return content;
+    }
 }

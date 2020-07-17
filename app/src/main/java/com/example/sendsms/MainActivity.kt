@@ -4,10 +4,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.telephony.SmsManager
 import android.text.TextUtils
@@ -18,11 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.yanzhenjie.permission.runtime.Permission
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
-import java.lang.Exception
+import java.io.*
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.collections.ArrayList
@@ -123,6 +117,17 @@ class MainActivity : AppCompatActivity() {
                 senMsm(com)
             }
         }
+        //全部删除
+        btn_delete_all.setOnClickListener {
+            if (mArray.isNullOrEmpty()) {
+                Toast.makeText(this, "内容为空", Toast.LENGTH_SHORT).show();
+                return@setOnClickListener
+            }
+            clearPhone()
+            clearData()
+            mAdapter?.notifyDataSetChanged()
+            Toast.makeText(this, "删除成功", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private fun senMsm(com: String?) {
@@ -193,20 +198,15 @@ class MainActivity : AppCompatActivity() {
         if (!file.exists()) return
         val it = FileInputStream(file)
         if (it != null) {
-            val inputReader = InputStreamReader(it)
-            val buf = BufferedReader(inputReader)
-            var line: String? = null
-            while (true) {
-                line = buf.readLine() ?: break
-            }
-            buf.close()
-            if (TextUtils.isEmpty(line)) {
-                return
-            }
+            val line = mReadTxtFile(path!!)
             val split = line?.split(";") as MutableList<String>
-            val set=TreeSet(split)
-            val result= mutableListOf<String>()
+            //过滤为空的值
+            val filter = split.filter {  "" != it }
+            //去重
+            val set = TreeSet(filter)
+            val result = mutableListOf<String>()
             result.addAll(set)
+            //并集
             mArray?.removeAll(result)
             addData(result)
             mAdapter?.notifyDataSetChanged()
@@ -291,5 +291,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun mReadTxtFile(strFilePath: String): String? {
+        var content = "" //文件内容字符串
+        //打开文件
+        val file = File(strFilePath)
+        //如果path是传递过来的参数，可以做一个非目录的判断
+        if (file.isDirectory) {
+        } else {
+            try {
+                val instream: InputStream = FileInputStream(file)
+                if (instream != null) {
+                    var line: String? = null
+                    val buffreader = BufferedReader(
+                        InputStreamReader(
+                            FileInputStream(file), "UTF-8"
+                        )
+                    )
+                    //分行读取
+                    while (buffreader.readLine().also { line = it } != null) {
+                        content += "$line;"
+                    }
+                    instream.close()
+                }
+            } catch (e: FileNotFoundException) {
+                Log.d("TestFile", "The File doesn't not exist.")
+            } catch (e: IOException) {
+                Log.d("TestFile", e.message!!)
+            }
+        }
+        return content
+    }
 
 }
