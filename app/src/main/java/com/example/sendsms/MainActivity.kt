@@ -2,6 +2,7 @@ package com.example.sendsms
 
 import android.app.PendingIntent
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
@@ -12,6 +13,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.yanzhenjie.permission.runtime.Permission
@@ -114,7 +116,9 @@ class MainActivity : AppCompatActivity() {
                 "发送短信需要允许该权限",
                 arrayOf(Permission.SEND_SMS, Permission.READ_PHONE_STATE)
             ) {
-                senMsm(com)
+                showDilaog {
+                    senMsm(com)
+                }
             }
         }
         //全部删除
@@ -193,7 +197,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun bindViewData(path: String?) {
-        if (TextUtils.isEmpty(path)) return
+        if (TextUtils.isEmpty(path)) {
+            Toast.makeText(this, "获取路径失败", Toast.LENGTH_SHORT).show();
+            return
+        }
         val file = File(path)
         if (!file.exists()) return
         val it = FileInputStream(file)
@@ -201,7 +208,7 @@ class MainActivity : AppCompatActivity() {
             val line = mReadTxtFile(path!!)
             val split = line?.split(";") as MutableList<String>
             //过滤为空的值
-            val filter = split.filter {  "" != it }
+            val filter = split.filter { "" != it }
             //去重
             val set = TreeSet(filter)
             val result = mutableListOf<String>()
@@ -320,6 +327,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return content
+    }
+
+    private fun showDilaog(onSure: () -> Unit) {
+        val dialog = AlertDialog.Builder(this)
+        dialog.setTitle("温馨提示")
+        dialog.setMessage("是否确认发送编辑内容")
+        dialog.setNegativeButton("取消", DialogInterface.OnClickListener { dialogInterface, i ->
+
+        })
+        dialog.setPositiveButton("发送", DialogInterface.OnClickListener { dialogInterface, i ->
+            onSure()
+        })
+        dialog.create().show()
     }
 
 }

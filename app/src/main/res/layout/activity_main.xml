@@ -11,11 +11,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
         <EditText
             android:id="@+id/et_input_send"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="40dp"
             android:layout_marginTop="16dp"
             android:layout_marginRight="4dp"
             android:background="@drawable/gm_send_bg"
@@ -23,42 +22,41 @@
             android:inputType="phone"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
+            android:layout_marginLeft="4dp"
             android:textColor="@color/black"
             android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@id/btn_add_phone"
+
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/btn_add_phone"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/btn_add_phone"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginRight="4dp"
             android:background="#3CB371"
+            android:layout_marginTop="4dp"
             android:gravity="center"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:text="添加"
             android:textColor="@color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/btn_add_dao"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/et_input_send" />
 
         <Button
             android:id="@+id/btn_add_dao"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginLeft="4dp"
             android:background="#3CB371"
             android:gravity="center"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
+            app:layout_constraintLeft_toRightOf="@id/btn_add_phone"
             android:text="导入"
             android:textColor="@color/white"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintRight_toLeftOf="@id/btn_delete_all"
+            app:layout_constraintTop_toTopOf="@id/btn_add_phone" />
 
         <EditText
             android:id="@+id/et_input_send_content"
@@ -69,6 +67,7 @@
             android:hint="请编辑发送内容"
             android:minLines="4"
             android:padding="8dp"
+            android:layout_margin="4dp"
             android:textColor="@color/black"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -86,28 +85,16 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="@id/et_input_send_content" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:id="@+id/tv_phone"
-            android:textSize="14sp"
-            android:text="手机号"
-            app:layout_constraintRight_toLeftOf="@id/btn_delete_all"
-            android:gravity="center"
-            app:layout_constraintTop_toTopOf="@id/btn_delete_all"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="@id/btn_delete_all"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:layout_height="0dp" />
         <Button
             android:text="全部删除"
             android:background="#3CB371"
-            android:layout_marginTop="4dp"
+            android:layout_marginLeft="4dp"
             android:textColor="@color/white"
-            app:layout_constraintTop_toBottomOf="@id/btn_add_phone"
+            app:layout_constraintLeft_toRightOf="@id/btn_add_dao"
+            app:layout_constraintTop_toTopOf="@id/btn_add_phone"
             app:layout_constraintRight_toRightOf="parent"
             android:id="@+id/btn_delete_all"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="40dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
