@@ -170,6 +170,7 @@ class MainActivity : AppCompatActivity() {
         mArray?.removeAll(result)
         addData(result)
         mAdapter?.notifyDataSetChanged()
+        Toast.makeText(this, "导入成功", Toast.LENGTH_SHORT).show();
     }
 
     private fun senMsm(com: String?) {
