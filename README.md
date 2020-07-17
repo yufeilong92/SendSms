@@ -38,7 +38,13 @@
                 intent1.addCategory(Intent.CATEGORY_OPENABLE)
                 startActivityForResult(intent1, REQEUESTCODE)
                 
-                   var path: String? = null
+                
+       override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (data == null) {
+            return
+        }
+        var path: String? = null
         if (requestCode == REQEUESTCODE) {
             val rui = data.data
             if ("file".equals(rui!!.scheme)) {
@@ -58,6 +64,9 @@
                 bindViewData(path)
             }
         }
+
+
+    }
         
      private fun bindViewData(path: String?) {
         if (TextUtils.isEmpty(path)) {
