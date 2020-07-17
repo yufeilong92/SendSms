@@ -96,10 +96,17 @@ class MainActivity : AppCompatActivity() {
                 )
             ) {
 
-                val intent1 = Intent(Intent.ACTION_GET_CONTENT)
-                intent1.setType("*/*")
-                intent1.addCategory(Intent.CATEGORY_OPENABLE)
-                startActivityForResult(intent1, REQEUESTCODE)
+//                val intent1 = Intent(Intent.ACTION_GET_CONTENT)
+//                intent1.setType("*/*")
+//                intent1.addCategory(Intent.CATEGORY_OPENABLE)
+//                startActivityForResult(intent1, REQEUESTCODE)
+
+                 val intent=Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                     addCategory(Intent.CATEGORY_OPENABLE)
+                     type="*/*"
+                 }
+                startActivityForResult(intent,REQEUESTCODE)
+
             }
         }
         //发送
@@ -242,13 +249,32 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "请选择txt 文件", Toast.LENGTH_SHORT).show();
                     return
                 }
-                bindViewData(path)
+                val line= readTextFromUri(rui!!)
+                val split = line?.split(";") as MutableList<String>
+                //过滤为空的值
+                val filter = split.filter { "" != it && isPhoneNum(it.trim().replace(" ", "")) }
+                Goheavy(filter)
+//                bindViewData(path)
             }
         }
 
 
     }
-
+    @Throws(IOException::class)
+    private fun readTextFromUri(uri: Uri): String {
+        val stringBuilder = StringBuilder()
+        contentResolver.openInputStream(uri)?.use { inputStream ->
+            BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                var line: String? = reader.readLine()
+                while (line != null) {
+                    stringBuilder.append(line)
+                    stringBuilder.append(";")
+                    line = reader.readLine()
+                }
+            }
+        }
+        return stringBuilder.toString()
+    }
     private fun bindViewData(path: String?) {
         if (TextUtils.isEmpty(path)) {
             Toast.makeText(this, "获取路径失败", Toast.LENGTH_SHORT).show();
