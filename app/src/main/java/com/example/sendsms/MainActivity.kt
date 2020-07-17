@@ -8,6 +8,7 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.provider.ContactsContract
 import android.telephony.SmsManager
 import android.text.TextUtils
 import android.util.Log
@@ -132,6 +133,43 @@ class MainActivity : AppCompatActivity() {
             mAdapter?.notifyDataSetChanged()
             Toast.makeText(this, "删除成功", Toast.LENGTH_SHORT).show();
         }
+        //通讯录
+        btn_add_tong.setOnClickListener {
+            KotlinPermissionUtils.showPermission(
+                this,
+                "获取通讯录信息需要获取权限",
+                arrayOf(Permission.READ_CONTACTS)
+            ) {
+                bindViewSmsData()
+
+            }
+        }
+    }
+
+    private fun bindViewSmsData() {
+        val list= mutableListOf<String>()
+        contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+        null,null,null,null)?.apply {
+            while (moveToNext()){
+                val phone=getString(getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                list.add(phone)
+            }
+            //过滤为空的值
+            val filter = list.filter { ""!=it&&isPhoneNum(it.trim().replace(" ","")) }
+            Goheavy(filter)
+        }
+
+    }
+
+    private fun Goheavy(filter: List<String>) {
+        //去重
+        val set = TreeSet(filter)
+        val result = mutableListOf<String>()
+        result.addAll(set)
+        //并集
+        mArray?.removeAll(result)
+        addData(result)
+        mAdapter?.notifyDataSetChanged()
     }
 
     private fun senMsm(com: String?) {
@@ -208,15 +246,8 @@ class MainActivity : AppCompatActivity() {
             val line = mReadTxtFile(path!!)
             val split = line?.split(";") as MutableList<String>
             //过滤为空的值
-            val filter = split.filter { "" != it }
-            //去重
-            val set = TreeSet(filter)
-            val result = mutableListOf<String>()
-            result.addAll(set)
-            //并集
-            mArray?.removeAll(result)
-            addData(result)
-            mAdapter?.notifyDataSetChanged()
+            val filter = split.filter { "" != it&&isPhoneNum(it.trim().replace(" ","")) }
+            Goheavy(filter)
         }
 
 
