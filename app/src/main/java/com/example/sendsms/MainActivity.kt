@@ -251,7 +251,6 @@ class MainActivity : AppCompatActivity() {
             Goheavy(filter)
         }
 
-
     }
 
     private fun clearData() {
